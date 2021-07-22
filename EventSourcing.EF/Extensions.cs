@@ -12,7 +12,7 @@ namespace EventSourcing.EF
             var data = serializer.Deserialize<IDomainEvent>(eventData, Type.GetType(@event.EventType));
 
             data.AggregateId = @event.AggregateId;
-            data.AggregateVersion = @event.Version;
+            data.AggregateVersion = @event.AggregateVersion;
             data.DateCreated = @event.DateCreated;
 
             return data;

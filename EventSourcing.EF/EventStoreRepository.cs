@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EventSourcing.EF
 {
-    public class EventStoreRepository : IEventStoreRepository
+    internal class EventStoreRepository : IEventStoreRepository
     {
         private readonly IEventStore _eventStore;
 
@@ -15,7 +15,7 @@ namespace EventSourcing.EF
             _eventStore = eventStore;
         }
 
-        public async Task<TAggregate> LoadAggregateAsync<TAggregate>(Guid aggregateId, CancellationToken cancellationToken = default) where TAggregate : IEventSourcingAggregate
+        public async Task<TAggregate> LoadAggregateAsync<TAggregate>(Guid aggregateId, CancellationToken cancellationToken = default) where TAggregate : AggregateBase
         {
             var events = await _eventStore.LoadEventsAsync(aggregateId, cancellationToken);
             if (!events.Any())
@@ -37,7 +37,7 @@ namespace EventSourcing.EF
             return aggregate;
         }
 
-        public async Task<List<IDomainEvent>> SaveAsync<TAggregate>(TAggregate aggregate, CancellationToken cancellationToken = default) where TAggregate : IEventSourcingAggregate
+        public async Task<List<IDomainEvent>> SaveAsync<TAggregate>(TAggregate aggregate, CancellationToken cancellationToken = default) where TAggregate : AggregateBase
         {
             var aggregateName = aggregate.GetType().Name.Replace("Aggregate", string.Empty);
             var events = aggregate.GetUncomittedEvents().ToList();

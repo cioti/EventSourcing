@@ -19,11 +19,12 @@ namespace EventSourcing.EF
             _serializer = serializer;
         }
 
+
         public async Task<IEnumerable<IDomainEvent>> LoadEventsAsync(Guid aggregateId, long version, CancellationToken cancellationToken = default)
         {
-            var events = await _context.Events
+            var events = await _context.EventStore
                 .AsNoTracking()
-                .Where(ev => ev.AggregateId == aggregateId && ev.Version > version)
+                .Where(ev => ev.AggregateId == aggregateId && ev.AggregateVersion > version)
                 .ToListAsync(cancellationToken);
 
             return events.Select(ev => ev.Deserialize(_serializer)).AsEnumerable();
@@ -31,7 +32,7 @@ namespace EventSourcing.EF
 
         public async Task<IEnumerable<IDomainEvent>> LoadEventsAsync(Guid aggregateId, CancellationToken cancellationToken = default)
         {
-            var events = await _context.Events
+            var events = await _context.EventStore
                 .AsNoTracking()
                 .Where(ev => ev.AggregateId == aggregateId)
                 .ToListAsync(cancellationToken);
@@ -43,7 +44,7 @@ namespace EventSourcing.EF
         {
             var events = domainEvents.Select(de => de.Serialize(aggregateName, _serializer));
 
-            await _context.Events.AddRangeAsync(events, cancellationToken);
+            await _context.EventStore.AddRangeAsync(events, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
         }
 

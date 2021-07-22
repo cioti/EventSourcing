@@ -7,10 +7,9 @@ namespace EventSourcing.Sample.Aggregate
 {
     public class SampleAggregate : AggregateBase
     {
-        private readonly List<IDomainEvent> _events = new();
-        public SampleAggregate()
+        public SampleAggregate(Guid id)
         {
-            Id = Guid.NewGuid();
+            Id = id;
         }
 
         public string Property1 { get; set; }
@@ -19,7 +18,7 @@ namespace EventSourcing.Sample.Aggregate
         public void ChangeProperty(string property)
         {
             Property1 = property;
-            _events.Add(new Property1ChangedEvent(Id,AggregateVersion, property));
+            AddEvent(new Property1ChangedEvent(Id,AggregateVersion, property));
         }
 
 

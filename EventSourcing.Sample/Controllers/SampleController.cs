@@ -19,19 +19,19 @@ namespace EventSourcing.Sample.Controllers
             _repo = repo;
         }
 
-        [HttpGet("/save")]
-        public async Task<IActionResult> Save()
+        [HttpGet("/save/{id}")]
+        public async Task<IActionResult> Save(Guid id)
         {
-            var agg = new SampleAggregate();
+            var agg = new SampleAggregate(id);
             agg.ChangeProperty("bla bla");
             var events = await _repo.SaveAsync(agg);
             return Ok(events);
         }
 
-        [HttpGet("/get")]
-        public async Task<IActionResult> Get()
+        [HttpGet("/get/{id}")]
+        public async Task<IActionResult> Get(Guid id)
         {
-            var agg = await _repo.LoadAggregateAsync<SampleAggregate>(Guid.Parse("AEC9EAA0-F361-4640-8D76-5E8FE66E1CF9"));
+            var agg = await _repo.LoadAggregateAsync<SampleAggregate>(id);
             return Ok(agg);
         }
     }

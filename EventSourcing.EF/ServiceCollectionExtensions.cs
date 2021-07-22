@@ -10,7 +10,9 @@ namespace EventSourcing.EF
         {
             services.AddSingleton<ISerializer, JsonSerializer>();
             services.AddScoped<IEventStore, EventStore>();
-            services.AddScoped<IEventStoreRepository, EventStoreRepository>();
+            services.AddScoped<ISnapshotStore, SnapshotStore>();
+            services.AddScoped<EventStoreRepository>();
+            services.AddScoped<IEventStoreRepository, SnapshotStoreRepository>();
             services.AddDbContext<EventStoreDbContext>(opts
                 => opts.UseSqlServer(connString, opts => opts.MigrationsAssembly(typeof(EventStoreDbContext).Assembly.FullName)));
             return services;
