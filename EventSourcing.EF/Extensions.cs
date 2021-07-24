@@ -1,4 +1,5 @@
-﻿using EventSourcing.Utility;
+﻿using EventSourcing.Events;
+using EventSourcing.Utility;
 using System;
 using System.Text;
 

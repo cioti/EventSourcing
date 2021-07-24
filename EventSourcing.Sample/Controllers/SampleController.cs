@@ -1,4 +1,6 @@
-﻿using EventSourcing.Sample.Aggregate;
+﻿using EventSourcing.Commands;
+using EventSourcing.Sample.Aggregate;
+using EventSourcing.Sample.Commands;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,20 +14,20 @@ namespace EventSourcing.Sample.Controllers
     [Route("[controller]")]
     public class SampleController : ControllerBase
     {
+        private readonly ICommandBus _commandBus;
         private readonly IEventStoreRepository _repo;
 
-        public SampleController(IEventStoreRepository repo)
+        public SampleController(ICommandBus commandBus,IEventStoreRepository repo)
         {
+            _commandBus = commandBus;
             _repo = repo;
         }
 
         [HttpGet("/save/{id}")]
         public async Task<IActionResult> Save(Guid id)
         {
-            var agg = new SampleAggregate(id);
-            agg.ChangeProperty("bla bla");
-            var events = await _repo.SaveAsync(agg);
-            return Ok(events);
+            await _commandBus.SendAsync(new CreateSampleCommand(id));
+            return Ok();
         }
 
         [HttpGet("/get/{id}")]

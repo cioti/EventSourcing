@@ -10,6 +10,7 @@ namespace EventSourcing.Sample.Aggregate
         public SampleAggregate(Guid id)
         {
             Id = id;
+            AddEvent(new SampleAggregateCreatedEvent(Id, AggregateVersion));
         }
 
         public string Property1 { get; set; }
@@ -18,7 +19,7 @@ namespace EventSourcing.Sample.Aggregate
         public void ChangeProperty(string property)
         {
             Property1 = property;
-            AddEvent(new Property1ChangedEvent(Id,AggregateVersion, property));
+            AddEvent(new Property1ChangedEvent(Id, AggregateVersion, property));
         }
 
 

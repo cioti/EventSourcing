@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EventSourcing.Events;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventSourcing.EF
 {

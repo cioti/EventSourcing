@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EventSourcing
+namespace EventSourcing.Events
 {
     public class Event
     {

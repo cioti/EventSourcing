@@ -1,14 +1,18 @@
-﻿using EventSourcing.Utility;
+﻿using EventSourcing.Events;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace EventSourcing.EF
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddEventSourcing(this IServiceCollection services,string connString)
+        public static IServiceCollection AddEventSourcing(this IServiceCollection services,string connString,params Assembly[] assemblies)
         {
-            services.AddSingleton<ISerializer, JsonSerializer>();
+            services.AddCoreES(assemblies);
+            services.AddScoped<ServiceFactory>(p => p.GetService);
+            services.AddScoped<ParallelMediator>();
             services.AddScoped<IEventStore, EventStore>();
             services.AddScoped<ISnapshotStore, SnapshotStore>();
             services.AddScoped<EventStoreRepository>();
