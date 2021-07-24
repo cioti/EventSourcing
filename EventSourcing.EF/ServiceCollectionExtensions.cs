@@ -1,5 +1,4 @@
-﻿using EventSourcing.Events;
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -12,7 +11,6 @@ namespace EventSourcing.EF
         {
             services.AddCoreES(assemblies);
             services.AddScoped<ServiceFactory>(p => p.GetService);
-            services.AddScoped<ParallelMediator>();
             services.AddScoped<IEventStore, EventStore>();
             services.AddScoped<ISnapshotStore, SnapshotStore>();
             services.AddScoped<EventStoreRepository>();

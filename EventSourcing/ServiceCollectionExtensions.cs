@@ -13,7 +13,6 @@ namespace EventSourcing
         {
             services.AddSingleton<ISerializer, JsonSerializer>();
             services.AddScoped<ServiceFactory>(p => p.GetService);
-            services.AddScoped<ParallelMediator>();
             services.AddScoped<IEventBus, EventBus>();
             services.AddScoped<ICommandBus, CommandBus>();
             services.AddMediatR(assemblies);

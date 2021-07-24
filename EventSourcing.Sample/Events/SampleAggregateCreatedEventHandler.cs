@@ -10,10 +10,26 @@ namespace EventSourcing.Sample.Events
 {
     public class SampleAggregateCreatedEventHandler : IEventHandler<SampleAggregateCreatedEvent>
     {
-        public Task Handle(SampleAggregateCreatedEvent notification, CancellationToken cancellationToken)
+        private readonly IEventStoreRepository _repository;
+
+        public SampleAggregateCreatedEventHandler(IEventStoreRepository repository)
         {
-            Console.WriteLine("bla bla bla");
-            return Task.CompletedTask;
+            _repository = repository;
+        }
+        public async Task Handle(SampleAggregateCreatedEvent notification, CancellationToken cancellationToken)
+        {
+            try
+            {
+                Console.WriteLine("bla bla bla");
+                var agg = await _repository.LoadAggregateAsync<SampleAggregate>(new Guid("3f6c1c8f-da88-4dd6-b410-7912db4d594f"));
+                Console.WriteLine(agg.AggregateVersion);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+            
         }
     }
 }
