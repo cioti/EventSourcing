@@ -15,18 +15,21 @@ namespace EventSourcing.EF
         private readonly EventStoreRepository _eventStoreRepository;
         private readonly ISerializer _serializer;
         private readonly IEventBus _eventBus;
+        private readonly ISnapshotStrategy _snapshotStrategy;
 
         public SnapshotStoreRepository(ISnapshotStore snapshotStore,
             IEventStore eventStore,
             EventStoreRepository eventStoreRepository,
             ISerializer serializer,
-            IEventBus eventBus)
+            IEventBus eventBus,
+            ISnapshotStrategy snapshotStrategy)
         {
             _snapshotStore = snapshotStore;
             _eventStore = eventStore;
             _eventStoreRepository = eventStoreRepository;
             _serializer = serializer;
             _eventBus = eventBus;
+            _snapshotStrategy = snapshotStrategy;
         }
 
         public async Task<TAggregate> LoadAggregateAsync<TAggregate>(Guid aggregateId, CancellationToken cancellationToken = default) where TAggregate : AggregateBase
@@ -49,11 +52,12 @@ namespace EventSourcing.EF
 
         public async Task<List<IDomainEvent>> SaveAsync<TAggregate>(TAggregate aggregate, CancellationToken cancellationToken = default) where TAggregate : AggregateBase
         {
-            // check snapshot strategy if we take snapshot
-            var serializedAggregate = _serializer.Serialize(aggregate);
-            var snapshot = new Snapshot(aggregate.Id, aggregate.AggregateVersion, Encoding.UTF8.GetBytes(serializedAggregate));
-
-            await _snapshotStore.SaveAsync(snapshot, cancellationToken);
+            if (_snapshotStrategy.ShouldTakeSnapshot(aggregate))
+            {
+                var serializedAggregate = _serializer.Serialize(aggregate);
+                var snapshot = new Snapshot(aggregate.Id, aggregate.AggregateVersion, Encoding.UTF8.GetBytes(serializedAggregate));
+                await _snapshotStore.SaveAsync(snapshot, cancellationToken);
+            }
 
             var events =  await _eventStoreRepository.SaveAsync(aggregate, cancellationToken);
             await _eventBus.PublishAsync(events.ToArray());

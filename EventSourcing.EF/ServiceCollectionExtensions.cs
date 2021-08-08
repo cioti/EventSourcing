@@ -7,7 +7,7 @@ namespace EventSourcing.EF
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddEventSourcing(this IServiceCollection services,string connString,params Assembly[] assemblies)
+        public static IServiceCollection AddEventSourcing(this IServiceCollection services, string connString, params Assembly[] assemblies)
         {
             services.AddCoreES(assemblies);
             services.AddScoped<ServiceFactory>(p => p.GetService);
