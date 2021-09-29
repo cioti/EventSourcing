@@ -6,7 +6,6 @@ namespace EventSourcing
 {
     public abstract class AggregateBase : IEventSourcingAggregate
     {
-    
         private readonly ICollection<IDomainEvent> _uncommitedEvents;
         private readonly Dictionary<Type, Action<IDomainEvent>> _eventAppliers;
 
@@ -19,24 +18,32 @@ namespace EventSourcing
         }
         public const int InitialVersion = 0;
         public Guid AggregateId { get; set; }
-        public long AggregateVersion  { get; set; }
+        public long AggregateVersion { get; set; }
 
         public void AddEvent(IDomainEvent @event) => _uncommitedEvents.Add(@event);
         public IEnumerable<IDomainEvent> GetUncomittedEvents()
         {
             lock (_uncommitedEvents)
             {
-                var events = _uncommitedEvents.AsEnumerable();
+                return _uncommitedEvents.ToList();
+            }
+        }
+
+        public IEnumerable<IDomainEvent> FlushUncomittedEvents()
+        {
+            lock (_uncommitedEvents)
+            {
+                var events = _uncommitedEvents.AsEnumerable().ToList();
                 var i = 1;
                 foreach (var @event in events)
                 {
-                    if(@event.AggregateId == Guid.Empty)
+                    if (@event.AggregateId == Guid.Empty)
                     {
                         @event.AggregateId = AggregateId;
                     }
                     @event.AggregateVersion = AggregateVersion + i;
                     @event.DateCreated = DateTime.UtcNow;
-                    i++; 
+                    i++;
                 }
                 AggregateVersion = AggregateVersion + _uncommitedEvents.Count;
 
@@ -49,9 +56,10 @@ namespace EventSourcing
             var evtType = evt.GetType();
             if (!this._eventAppliers.ContainsKey(evtType))
             {
-                throw new AggregateEventApplierNotFound(this.GetType(),evtType);
+                throw new AggregateEventApplierNotFound(this.GetType(), evtType);
             }
             this._eventAppliers[evtType](evt);
+            AggregateId = evt.AggregateId;
             AggregateVersion++;
         }
         protected abstract void RegisterAppliers();

@@ -40,13 +40,7 @@ namespace EventSourcing.EF
         public async Task<List<IDomainEvent>> SaveAsync<TAggregate>(TAggregate aggregate, CancellationToken cancellationToken = default) where TAggregate : AggregateBase
         {
             var aggregateName = aggregate.GetType().Name.Replace("Aggregate", string.Empty);
-            var events = aggregate.GetUncomittedEvents().ToList();
-
-            for (int i = 0; i < events.Count; i++)
-            {
-                if (aggregate.AggregateVersion + 1 != events[i].AggregateVersion)
-                    throw new AggregateInvalidEventVersion(aggregate.AggregateId, typeof(TAggregate));
-            }
+            var events = aggregate.FlushUncomittedEvents().ToList();
 
             await _eventStore.WriteEventsAsync(aggregateName, events, cancellationToken);
             return events;

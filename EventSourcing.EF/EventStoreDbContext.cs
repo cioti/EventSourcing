@@ -7,6 +7,7 @@ namespace EventSourcing.EF
     {
         public EventStoreDbContext(DbContextOptions<EventStoreDbContext> options) : base(options)
         {
+            Database.Migrate();
         }
 
         public DbSet<Event> EventStore { get; set; }

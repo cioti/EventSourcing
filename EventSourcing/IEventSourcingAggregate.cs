@@ -7,5 +7,6 @@ namespace EventSourcing
         long AggregateVersion { get; set; }
         void Apply(IDomainEvent @event);
         IEnumerable<IDomainEvent> GetUncomittedEvents();
+        IEnumerable<IDomainEvent> FlushUncomittedEvents();
     }
 }
