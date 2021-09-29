@@ -55,7 +55,7 @@ namespace EventSourcing.EF
             if (_snapshotStrategy.ShouldTakeSnapshot(aggregate))
             {
                 var serializedAggregate = _serializer.Serialize(aggregate);
-                var snapshot = new Snapshot(aggregate.Id, aggregate.AggregateVersion, Encoding.UTF8.GetBytes(serializedAggregate));
+                var snapshot = new Snapshot(aggregate.AggregateId, aggregate.AggregateVersion, Encoding.UTF8.GetBytes(serializedAggregate));
                 await _snapshotStore.SaveAsync(snapshot, cancellationToken);
             }
 
@@ -73,7 +73,7 @@ namespace EventSourcing.EF
             }
             var stringData = Encoding.UTF8.GetString(snapshot.Data);
             var aggregate = _serializer.Deserialize<TAggregate>(stringData, typeof(TAggregate));
-            aggregate.Id = snapshot.AggregateId;
+            aggregate.AggregateId = snapshot.AggregateId;
             aggregate.AggregateVersion = snapshot.AggregateVersion;
 
             return aggregate;

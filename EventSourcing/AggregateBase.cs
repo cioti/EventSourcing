@@ -18,12 +18,32 @@ namespace EventSourcing
             RegisterAppliers();
         }
         public const int InitialVersion = 0;
-        public Guid Id { get; set; }
+        public Guid AggregateId { get; set; }
         public long AggregateVersion  { get; set; }
 
         public void AddEvent(IDomainEvent @event) => _uncommitedEvents.Add(@event);
-        public void ClearUncommitedEvents() => _uncommitedEvents.Clear();
-        public IEnumerable<IDomainEvent> GetUncomittedEvents() => _uncommitedEvents.AsEnumerable();
+        public IEnumerable<IDomainEvent> GetUncomittedEvents()
+        {
+            lock (_uncommitedEvents)
+            {
+                var events = _uncommitedEvents.AsEnumerable();
+                var i = 1;
+                foreach (var @event in events)
+                {
+                    if(@event.AggregateId == Guid.Empty)
+                    {
+                        @event.AggregateId = AggregateId;
+                    }
+                    @event.AggregateVersion = AggregateVersion + i;
+                    @event.DateCreated = DateTime.UtcNow;
+                    i++; 
+                }
+                AggregateVersion = AggregateVersion + _uncommitedEvents.Count;
+
+                _uncommitedEvents.Clear();
+                return events;
+            }
+        }
         public void Apply(IDomainEvent evt)
         {
             var evtType = evt.GetType();

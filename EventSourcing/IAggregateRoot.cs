@@ -4,6 +4,6 @@ namespace EventSourcing
 {
     public interface IAggregateRoot
     {
-        public Guid Id { get; }
+        public Guid AggregateId { get; }
     }
 }

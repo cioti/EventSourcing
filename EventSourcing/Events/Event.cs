@@ -5,7 +5,7 @@ namespace EventSourcing.Events
     public class Event
     {
         private Event() { }
-        public Event(Guid aggregateId, long aggregateVersion,string aggregateName, string eventType, byte[] data)
+        public Event(Guid aggregateId, long aggregateVersion, string aggregateName, string eventType, byte[] data)
         {
             if (aggregateId == Guid.Empty)
                 throw new ArgumentException($"{nameof(AggregateId)} cannot be empty.", nameof(aggregateId));

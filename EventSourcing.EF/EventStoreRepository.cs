@@ -45,7 +45,7 @@ namespace EventSourcing.EF
             for (int i = 0; i < events.Count; i++)
             {
                 if (aggregate.AggregateVersion + 1 != events[i].AggregateVersion)
-                    throw new AggregateInvalidEventVersion(aggregate.Id, typeof(TAggregate));
+                    throw new AggregateInvalidEventVersion(aggregate.AggregateId, typeof(TAggregate));
             }
 
             await _eventStore.WriteEventsAsync(aggregateName, events, cancellationToken);
